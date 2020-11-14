@@ -11,7 +11,7 @@ class murder_card:
     def print(self):
         print("Name: " + self.name)
         print("Weapon used: " + self.weapon_used)
-        print("Location: " + self.location)
+        print("Location: " + self.location.name)
         print("Drop number: " + str(self.drop_number))
         print("Activation number: " + str(self.activation_number))
 
@@ -30,7 +30,7 @@ class room:
 
     def print(self):
         print("Name: " + self.name)
-        if (str(self.people) != "[]"):
+        if str(self.people) != "[]":
             print("People: " + str(self.people))
         else:
             print("Empty")
