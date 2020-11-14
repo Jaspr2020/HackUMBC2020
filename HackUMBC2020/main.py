@@ -1,5 +1,36 @@
 import random
 
+class murder_card:
+    def __init__(self, name, weapon, location, drop, activation):
+        self.name = name
+        self.weapon_used = weapon
+        self.location = location
+        self.drop_number = drop
+        self.activation_number = activation
+
+    def print(self):
+        print("Name: " + self.name)
+        print("Weapon used: " + self.weapon_used)
+        print("Location: " + self.location)
+        print("Drop number: " + str(self.drop_number))
+        print("Activation number: " + str(self.activation_number))
+
+class alabi_card:
+    def __init__(self, activity, location, drop, activation):
+        self.activity = activity
+        self.location = location
+        self.drop_number = drop
+        self.activation_number = activation
+
+class room:
+    def __init__(self, room):
+        self.room = room
+
+def load_cards():
+    cards = []
+    cards.append(murder_card("Venzah", "Knife", "Emme's room", 1, [3,4]))
+    return cards
+
 def rollDice(numRolls):
     rolls = []
 
@@ -13,6 +44,11 @@ def printRolls(rolls):
         print("You rolled " + str(roll))
 
 if __name__ == '__main__':
+    murder_cards = load_cards()
+    for card in murder_cards:
+        card.print()
+
+    """
     numRolls = -1
     while numRolls < 1:
         numRolls = input("How many rolls? ")
@@ -23,5 +59,7 @@ if __name__ == '__main__':
 
     rolls = rollDice(3)
     printRolls(rolls)
+    """
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
