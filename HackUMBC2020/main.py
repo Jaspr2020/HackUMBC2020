@@ -23,8 +23,26 @@ class alabi_card:
         self.activation_number = activation
 
 class room:
-    def __init__(self, room):
-        self.room = room
+    def __init__(self, name):
+        self.name = name
+        self.people = []
+        self.murder = False
+
+    def print(self):
+        print("Name: " + self.name)
+        if (str(self.people) != "[]"):
+            print("People: " + str(self.people))
+        else:
+            print("Empty")
+
+def make_rooms(num_rooms):
+    rooms = []
+
+    # TODO: make list to pull random names from
+    for i in range(num_rooms):
+        rooms.append(room("Name"))
+
+    return rooms
 
 def load_cards():
     cards = []
@@ -44,9 +62,24 @@ def printRolls(rolls):
         print("You rolled " + str(roll))
 
 if __name__ == '__main__':
+    numPlayers = -1
+    while numPlayers < 1:
+        numPlayers = input("How many players? ")
+        if not numPlayers.isnumeric():
+            numPlayers = -1
+        else:
+            numPlayers = int(numPlayers)
+
+    rooms = make_rooms(numPlayers + 2)
+    for room in rooms:
+        room.print()
+
+
+    """
     murder_cards = load_cards()
     for card in murder_cards:
         card.print()
+    """
 
     """
     numRolls = -1
