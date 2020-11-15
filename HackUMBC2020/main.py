@@ -1,16 +1,38 @@
 from random import randint
 
-class murder_card:
-    def __init__(self, name, weapon, location, drop, activation):
+class player:
+    def __init__(self, name):
         self.name = name
+        rolls = rollDice(4)
+        self.speed = rolls[0]
+        self.weapon_proficiency = rolls[1]
+        self.stealth = rolls[2]
+        self.survival = rolls[3]
+        self.weapon_cards = []
+
+    def print(self):
+        print('\n' + ''"Name: " + self.name)
+        print("Speed: " + str(self.speed))
+        print("Weapon Proficiency: " + str(self.weapon_proficiency))
+        print("Stealth: " + str(self.stealth))
+        print("Survival: " + str(self.survival))
+
+        if len(self.weapon_cards) > 0:
+            for card in self.weapon_cards:
+                card.print()
+
+    def add_weapon(self, card):
+        self.weapon_cards.append(card)
+
+class murder_card:
+    def __init__(self, weapon, location, drop, activation):
         self.weapon_used = weapon
         self.location = location
         self.drop_number = drop
         self.activation_number = activation
 
     def print(self):
-        print("Name: " + self.name)
-        print("Weapon used: " + self.weapon_used)
+        print('\n' + "Weapon: " + self.weapon_used)
         print("Location: " + self.location.name)
         print("Drop number: " + str(self.drop_number))
         print("Activation number: " + str(self.activation_number))
@@ -29,14 +51,16 @@ class room:
         self.murder = False
 
     def print(self):
-        print("Name: " + self.name)
-        if str(self.people) != "[]":
-            print("People: " + str(self.people))
-        else:
-            print("Empty")
+        # Print "Name: [NAME], (if not empty) People: LIST_OF_PEOPLE (if empty) No one is here"
+        print("Name: " + self.name + ", " + ("People: " + str(self.people) if self.people == "[]" else "No one is here"))
+
+class weapon:
+    def __init__(self, name, damage):
+        self.name = name
+        self.damage = damage
 
 def make_rooms(num_rooms):
-    rooms = ["Susquehanna Hall", "D-Hall", "Library", "Erickson Hall", "Patapsco Hall", "Harbor Hall", "Chesapeake Hall", "Harbor Hall", "The Tube"]
+    rooms = ["Susquehanna Hall", "D-Hall", "Library", "Erickson Hall", "Patapsco Hall", "Harbor Hall", "Chesapeake Hall", "Harbor Hall", "The Tube", "The Commons", "Event Center"]
     used_rooms = []
 
     for i in range(num_rooms):
@@ -47,9 +71,11 @@ def make_rooms(num_rooms):
 
     return used_rooms
 
-def load_cards():
+def load_cards(room):
     cards = []
-    cards.append(murder_card("Venzah", "Knife", "Emme's room", 1, [3,4]))
+    cards.append(murder_card("Knive", room[randint(0, len(room) - 1)], 1, [3,4]))
+    cards.append(murder_card("Scissors", room[randint(0, len(room) - 1)], 1, [3,4]))
+    cards.append(murder_card("Light stick", room[randint(0, len(room) - 1)], 1, [3,4]))
     return cards
 
 def rollDice(numRolls):
@@ -65,25 +91,34 @@ def printRolls(rolls):
         print("You rolled " + str(roll))
 
 if __name__ == '__main__':
+    # p1 = player("Venzah")
+    # p1.print()
+
     numPlayers = -1
-    while numPlayers < 1:
-        numPlayers = input("How many players? ")
+    while numPlayers < 5 or numPlayers > 8:
+        numPlayers = input("How many players? (5-8) ")
         if not numPlayers.isnumeric():
             numPlayers = -1
         else:
             numPlayers = int(numPlayers)
 
-    rooms = make_rooms(numPlayers + 2)
+    rooms = make_rooms(numPlayers + 3)
     for room in rooms:
         room.print()
 
+    players = []
+    for i in range(numPlayers):
+        players.append(player("Venzah"))
+
+    murder_cards = load_cards(rooms)
+    for i in range(len(murder_cards)):
+        players[i].add_weapon(murder_cards[i])
+        players[i].print()
+        # card[i].print()
 
 
-    """
-    murder_cards = load_cards()
-    for card in murder_cards:
-        card.print()
-    """
+
+
 
     """
     numRolls = -1
