@@ -1,6 +1,6 @@
 from random import randint
 
-class player:
+class Player:
     def __init__(self, name):
         self.name = name
         rolls = rollDice(4)
@@ -9,6 +9,7 @@ class player:
         self.stealth = rolls[2]
         self.survival = rolls[3]
         self.weapon_cards = []
+        self.winner = False
 
     def print(self):
         print('\n' + ''"Name: " + self.name)
@@ -90,10 +91,43 @@ def printRolls(rolls):
     for roll in rolls:
         print("You rolled " + str(roll))
 
+def take_turn():
+    roll = rollDice(4)
+
+
+def create_character():
+    name = input("Hello player, what's your name? ")
+    player = Player(name)
+    return player
+
+def play_game():
+    print("Welcome to UMBC!")
+    number_of_players = int(input("Now, how many of you are playing? "))
+
+    player_dic = {}
+    for i in range(number_of_players):
+        player = create_character()
+        player_dic["player{0}".format(i)] = player
+
+    turn = 0
+    end_game = False
+    while(not end_game):
+        for i in range(number_of_players):
+            take_turn()
+        for i in range(number_of_players):
+            if(player_dic["player{0}".format(i)].winner == True):
+                end_game = True
+        turn += 1
+
+
+
+
 if __name__ == '__main__':
+    play_game()
     # p1 = player("Venzah")
     # p1.print()
 
+    """
     numPlayers = -1
     while numPlayers < 5 or numPlayers > 8:
         numPlayers = input("How many players? (5-8) ")
@@ -115,7 +149,7 @@ if __name__ == '__main__':
         players[i].add_weapon(murder_cards[i])
         players[i].print()
         # card[i].print()
-
+    """
 
 
 
