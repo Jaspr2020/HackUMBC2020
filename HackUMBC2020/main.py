@@ -319,7 +319,7 @@ def play_game():
                 end_game = True
         turn += 1
 
-
+    
 
 
 if __name__ == '__main__':
