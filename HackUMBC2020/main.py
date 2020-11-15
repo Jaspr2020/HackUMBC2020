@@ -4,6 +4,41 @@ class Player:
     def __init__(self, name):
         self.name = name
         rolls = rollDice(4)
+        total = 0
+        for i in rolls:
+            total += i
+        print("Your dice rolls are: " + str(rolls) + " and your total is: " + str(total))
+
+        self.stat_dict = {
+            "Speed": 0,
+            "Weapon Proficiency": 0,
+            "Stealth": 0,
+            "Survival": 0
+        }
+
+        used_points = 0
+        for i in range(4):
+            if used_points < total:
+                stat = -1
+                while stat < 0 or stat > 6:
+                    # String to hold proper stat
+                    ability = self.stat_name(i)
+                    print("Points remaining: ", total - used_points)
+                    stat = input("How many points would you like to put into " + ability + "? (0-6) ")
+                    if not stat.isnumeric() or int(stat) < 0 or int(stat) > 6:
+                        stat = -1
+                        print("That is not a valid input.")
+                    else:
+                        stat = int(stat)
+                        used_points += stat
+                        if used_points < total:
+                            self.stat_dict[ability] = stat
+                        else:
+                            self.stat_dict[ability] = stat - (used_points - total)
+
+        for x, y in self.stat_dict.items():
+            print(x, ":", y)
+
         self.speed = rolls[0]
         self.weapon_proficiency = rolls[1]
         self.stealth = rolls[2]
@@ -25,15 +60,29 @@ class Player:
     def add_weapon(self, card):
         self.weapon_cards.append(card)
 
+    def stat_name(self, num):
+        if num == 0:
+            return "Speed"
+        elif num == 1:
+            return "Weapon Proficiency"
+        elif num == 2:
+            return "Stealth"
+        else:
+            return "Survival"
+
 class murder_card:
     def __init__(self, weapon, location, drop, activation):
+        # Should hold a weapon object
         self.weapon_used = weapon
+        # Should hold a room object
         self.location = location
+        # Should hold an int or int list
         self.drop_number = drop
+        # Should hold an int or int list
         self.activation_number = activation
 
     def print(self):
-        print('\n' + "Weapon: " + self.weapon_used)
+        print('\n' + "Weapon: " + self.weapon_used.name)
         print("Location: " + self.location.name)
         print("Drop number: " + str(self.drop_number))
         print("Activation number: " + str(self.activation_number))
@@ -74,7 +123,7 @@ def make_rooms(num_rooms):
 
 def load_cards(room):
     cards = []
-    cards.append(murder_card("Knive", room[randint(0, len(room) - 1)], 1, [3,4]))
+    cards.append(murder_card("Knife", room[randint(0, len(room) - 1)], 1, [3,4]))
     cards.append(murder_card("Scissors", room[randint(0, len(room) - 1)], 1, [3,4]))
     cards.append(murder_card("Light stick", room[randint(0, len(room) - 1)], 1, [3,4]))
     return cards
@@ -91,31 +140,58 @@ def printRolls(rolls):
     for roll in rolls:
         print("You rolled " + str(roll))
 
-def take_turn():
-    roll = rollDice(4)
+def take_turn(player_dic, player):
+    roll = rollDice(1)
+    print(roll)
+    for x in player_dic:
+        for card in player_dic[x].weapon_cards:
+            for i in card.activation_number:
+                if i == roll[0]:
+                    print("It worked i guess")
+    hello = input("Stop. ")
 
-
-def create_character():
+def create_character(rooms):
     name = input("Hello player, what's your name? ")
     player = Player(name)
+    murder = weapon("Knife", 1)
+    # player.add_weapon(murder)
+    activation = []
+    for i in range(1, 7):
+        activation.append(i)
+    room = rooms[randint(0, len(rooms) - 1)]
+    card = murder_card(murder, room, 1, activation)
+    player.add_weapon(card)
     return player
 
 def play_game():
     print("Welcome to UMBC!")
+    """
+    number_of_players = -1
+    while number_of_players < 5 or number_of_players > 8:
+        number_of_players = input("Now, how many of you are playing? (5-8) ")
+        if not number_of_players.isnumeric():
+            number_of_players = -1
+        else:
+            number_of_players = int(number_of_players)
+    """
+    # For testing (faster to make players)
     number_of_players = int(input("Now, how many of you are playing? "))
+
+    rooms = make_rooms(number_of_players + 3)
 
     player_dic = {}
     for i in range(number_of_players):
-        player = create_character()
+        player = create_character(rooms)
         player_dic["player{0}".format(i)] = player
 
     turn = 0
     end_game = False
     while(not end_game):
         for i in range(number_of_players):
-            take_turn()
+            print(player_dic["player{0}".format(i)].name, "'s turn!")
+            take_turn(player_dic, i)
         for i in range(number_of_players):
-            if(player_dic["player{0}".format(i)].winner == True):
+            if (player_dic["player{0}".format(i)].winner == True):
                 end_game = True
         turn += 1
 
