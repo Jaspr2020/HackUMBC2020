@@ -176,7 +176,7 @@ def take_turn(player_dic, player):
                         activated_dict[x].append(card)
     for x in activated_dict:
         print(x, "it\'s your turn!")
-        if(len(activated_dict[x]) == 0):
+        if len(activated_dict[x]) == 0:
             print("You activated no cards this round...")
         else:
             has_murder_card = False
@@ -195,12 +195,13 @@ def take_turn(player_dic, player):
                 print("Congragulations! You have the chance to murder! Choose wisely.")
                 for card in activated_dict[x]:
                     if(isinstance(card, murder_card) == True):
-                        print(card.weapon_used.name)
-                        print(card.weapon_used.damage)
-                        print(card.location.name)
-                        print(card.drop_number)
-                        print(card.activation_number)
-                        print()
+                        print("There are ", card.location.players, " in the ", card.location)
+                        # print(card.weapon_used.name)
+                        # print(card.weapon_used.damage)
+                        # print(card.location.name)
+                        # print(card.drop_number)
+                        # print(card.activation_number)
+                        #print()
                 choice = input("Which weapon do you want to use: ")
 
             elif(has_murder_card == True and murder_card_count == 1):
@@ -226,12 +227,13 @@ def take_turn(player_dic, player):
             print()
     hello = input("Stop. ")
 
-def create_character(cards):
+def create_character(rooms, cards):
     name = input("Hello player, what's your name? ")
     player = Player(name)
     for i in range(7):
         random_card = randint(0, len(cards) - 1)
         player.weapon_cards.append(cards[random_card])
+        rooms[randint(0, len(rooms) - 1)].people.append(player)
     return player
 
 def play_game():
@@ -253,7 +255,7 @@ def play_game():
 
     player_dic = {}
     for i in range(number_of_players):
-        player = create_character(cards)
+        player = create_character(rooms, cards)
         player_dic["player{0}".format(i)] = player
 
     turn = 0
