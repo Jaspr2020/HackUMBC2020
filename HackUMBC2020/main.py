@@ -1,4 +1,4 @@
-import random
+from random import randint
 
 class murder_card:
     def __init__(self, name, weapon, location, drop, activation):
@@ -36,13 +36,16 @@ class room:
             print("Empty")
 
 def make_rooms(num_rooms):
-    rooms = []
+    rooms = ["Susquehanna Hall", "D-Hall", "Library", "Erickson Hall", "Patapsco Hall", "Harbor Hall", "Chesapeake Hall", "Harbor Hall", "The Tube"]
+    used_rooms = []
 
-    # TODO: make list to pull random names from
     for i in range(num_rooms):
-        rooms.append(room("Name"))
+        random_number = randint(0, len(rooms)-1)
+        new_room = rooms[random_number]
+        used_rooms.append(room(new_room))
+        rooms.remove(new_room)
 
-    return rooms
+    return used_rooms
 
 def load_cards():
     cards = []
@@ -53,7 +56,7 @@ def rollDice(numRolls):
     rolls = []
 
     for i in range(numRolls):
-        rolls.append(random.randrange(1, 6))
+        rolls.append(randint(1, 6))
 
     return rolls
 
@@ -73,6 +76,7 @@ if __name__ == '__main__':
     rooms = make_rooms(numPlayers + 2)
     for room in rooms:
         room.print()
+
 
 
     """
