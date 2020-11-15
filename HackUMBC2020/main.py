@@ -7,6 +7,7 @@ class Player:
         total = 0
         for i in rolls:
             total += i
+        print()
         print("Your dice rolls are: " + str(rolls) + " and your total is: " + str(total))
 
         self.stat_dict = {
@@ -17,6 +18,9 @@ class Player:
         }
 
         used_points = 0
+        print("Here are your skills. Spend your points wisely!")
+        for x, y in self.stat_dict.items():
+            print(x, ":", y)
         for i in range(4):
             if used_points < total:
                 stat = -1
@@ -38,7 +42,10 @@ class Player:
 
         for x, y in self.stat_dict.items():
             print(x, ":", y)
+        print()
 
+        #ToDo: change self.health so that it is in correlation with the player's initital roll
+        self.health = 30
         self.speed = rolls[0]
         self.weapon_proficiency = rolls[1]
         self.stealth = rolls[2]
@@ -88,13 +95,12 @@ class murder_card:
         print("Activation number: " + str(self.activation_number))
 
 class alabi_card:
-    def __init__(self, activity, location, drop, activation):
-        self.activity = activity
+    def __init__(self, location, drop, activation):
         self.location = location
         self.drop_number = drop
         self.activation_number = activation
 
-class room:
+class Room:
     def __init__(self, name):
         self.name = name
         self.people = []
@@ -116,16 +122,33 @@ def make_rooms(num_rooms):
     for i in range(num_rooms):
         random_number = randint(0, len(rooms)-1)
         new_room = rooms[random_number]
-        used_rooms.append(room(new_room))
+        used_rooms.append(Room(new_room))
         rooms.remove(new_room)
 
     return used_rooms
 
-def load_cards(room):
+def load_cards(rooms):
+
+    weapon_list = ["Knife", "Scissors", "Light Stick", "Baseball Bat", "Heat Gun", "Katana", "Gun", "Hammer", "Bow and Arrow", "Pepper Spray", "Hole"]
+
+    room_list = []
+    for i in rooms:
+        room_list.append(i)
     cards = []
-    cards.append(murder_card("Knife", room[randint(0, len(room) - 1)], 1, [3,4]))
-    cards.append(murder_card("Scissors", room[randint(0, len(room) - 1)], 1, [3,4]))
-    cards.append(murder_card("Light stick", room[randint(0, len(room) - 1)], 1, [3,4]))
+    for i in range(len(room_list)):
+        random_number = randint(0, len(weapon_list)-1)
+        weapon_name = weapon_list[random_number]
+        cards.append(murder_card(weapon(weapon_name, randint(1, 6)), room_list[randint(0, len(room_list) - 1)], randint(1, 12), [randint(1, 6)]))
+        weapon_list.remove(weapon_name)
+
+    for i in range(len(room_list)):
+        random_number = randint(0, len(room_list)-1)
+        room_name = room_list[random_number]
+        cards.append(alabi_card(room_name, randint(1, 12), [randint(1, 6)]))
+        room_list.remove(room_name)
+
+    #Note: Use isinstance(object, type) to check if its a murder or alibi card
+
     return cards
 
 def rollDice(numRolls):
@@ -143,24 +166,72 @@ def printRolls(rolls):
 def take_turn(player_dic, player):
     roll = rollDice(1)
     print(roll)
+    activated_dict = {}
     for x in player_dic:
+        activated_dict[x] = []
         for card in player_dic[x].weapon_cards:
-            for i in card.activation_number:
-                if i == roll[0]:
-                    print("It worked i guess")
+            if card not in activated_dict[x]:
+                for i in card.activation_number:
+                    if i == roll[0]:
+                        activated_dict[x].append(card)
+    for x in activated_dict:
+        print(x, "it\'s your turn!")
+        if(len(activated_dict[x]) == 0):
+            print("You activated no cards this round...")
+        else:
+            has_murder_card = False
+            murder_card_count = 0
+            has_alibi_card = False
+            alibi_card_count = 0
+            for card in activated_dict[x]:
+                if(isinstance(card, murder_card) == True):
+                    murder_card_count += 1
+                    has_murder_card = True
+                elif(isinstance(card, alabi_card) == True):
+                    alibi_card_count += 1
+                    has_alibi_card = True
+
+            if(has_murder_card == True and murder_card_count > 1):
+                print("Congragulations! You have the chance to murder! Choose wisely.")
+                for card in activated_dict[x]:
+                    if(isinstance(card, murder_card) == True):
+                        print(card.weapon_used.name)
+                        print(card.weapon_used.damage)
+                        print(card.location.name)
+                        print(card.drop_number)
+                        print(card.activation_number)
+                        print()
+                choice = input("Which weapon do you want to use: ")
+
+            elif(has_murder_card == True and murder_card_count == 1):
+                for card in activated_dict[x]:
+                    if(isinstance(card, murder_card) == True):
+                        print("You used a", card.weapon_used.name, "which deals", card.weapon_used.damage, "at", card.location.name)
+
+            elif(has_murder_card == False):
+                print("Sorry! You can't murder this round. Maybe next time")
+            if(has_alibi_card == True and alibi_card_count > 1):
+                print("Congragulations! You have the chance to move! Choose wisely.")
+                for card in activated_dict[x]:
+                    if(isinstance(card, alabi_card) == True):
+                        print(card.location)
+                        print(card.drop_number)
+                        print(card.activation_number)
+            elif(has_alibi_card == True and alibi_card_count == 1):
+                for card in activated_dict[x]:
+                    if (isinstance(card, murder_card) == True):
+                        print("You went to", card.location.name)
+            elif(has_alibi_card == False):
+                print("Sorry! You have no chance to move. Hope we see you next round!")
+            print()
     hello = input("Stop. ")
 
-def create_character(rooms):
+def create_character(cards):
     name = input("Hello player, what's your name? ")
     player = Player(name)
-    murder = weapon("Knife", 1)
-    # player.add_weapon(murder)
-    activation = []
-    for i in range(1, 7):
-        activation.append(i)
-    room = rooms[randint(0, len(rooms) - 1)]
-    card = murder_card(murder, room, 1, activation)
-    player.add_weapon(card)
+    for i in range(7):
+        random_card = randint(0, len(cards) - 1)
+        player.weapon_cards.append(cards[random_card])
     return player
 
 def play_game():
@@ -178,10 +249,11 @@ def play_game():
     number_of_players = int(input("Now, how many of you are playing? "))
 
     rooms = make_rooms(number_of_players + 3)
+    cards = load_cards(rooms)
 
     player_dic = {}
     for i in range(number_of_players):
-        player = create_character(rooms)
+        player = create_character(cards)
         player_dic["player{0}".format(i)] = player
 
     turn = 0
